@@ -98,15 +98,18 @@ class ShopeeScraper:
             try:
                 username = item.get('author_username', '')
                 rating = item.get('rating_star', '')
-                timestamp = item.get('submit_time', '')
+                timestamp = item.get('submit_time') or item.get('ctime') or 0
                 product_items = item.get('product_items', [{}])
                 product_name = product_items[0].get('name', '') if product_items else ''
-                comment = item.get('comment', '')   # ambil isi review
+                comment = item.get('comment', '')
 
                 # Convert timestamp
-                utc_time = datetime.utcfromtimestamp(timestamp)
-                localized_time = pytz.utc.localize(utc_time).astimezone(indonesia_tz)
-                formatted_time = localized_time.strftime('%Y-%m-%d %H:%M:%S')
+                if timestamp:
+                    utc_time = datetime.utcfromtimestamp(timestamp)
+                    localized_time = pytz.utc.localize(utc_time).astimezone(indonesia_tz)
+                    formatted_time = localized_time.strftime('%Y-%m-%d %H:%M:%S')
+                else:
+                    formatted_time = ''
 
                 new_items.append([username, rating, formatted_time, product_name, comment])
             except Exception as e:
